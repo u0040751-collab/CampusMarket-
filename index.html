@@ -290,7 +290,126 @@ function contactSeller(item) {
 // POST ITEM
 // ==============================
 
-function postItem() {
+async function postItem() {
+
+  let name =
+    document.getElementById("itemName").value.trim();
+
+  let price =
+    document.getElementById("itemPrice").value;
+
+  let category =
+    document.getElementById("category").value;
+
+  let imageFile =
+    document.getElementById("itemImage").files[0];
+
+
+  if (!name || !price) {
+    alert("Please enter item name and price.");
+    return;
+  }
+
+
+  // Require a photo
+  if (!imageFile) {
+    alert("Please choose a product photo.");
+    return;
+  }
+
+
+  // Check that it is an image
+  if (!imageFile.type.startsWith("image/")) {
+    alert("Please choose an image file.");
+    return;
+  }
+
+
+  // Create a unique file name
+  const fileName =
+    Date.now() + "-" + imageFile.name;
+
+
+  // Upload photo to Supabase Storage
+  const { error: uploadError } =
+    await supabaseClient.storage
+      .from("product-images")
+      .upload(fileName, imageFile);
+
+
+  if (uploadError) {
+
+    console.error(uploadError);
+
+    alert(
+      "Photo upload failed: " +
+      uploadError.message
+    );
+
+    return;
+  }
+
+
+  // Get public photo URL
+  const { data: publicUrlData } =
+    supabaseClient.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+
+
+  const imageUrl =
+    publicUrlData.publicUrl;
+
+
+  // Create listing card
+  let card =
+    document.createElement("div");
+
+  card.className = "card";
+
+
+  card.innerHTML = `
+
+    <img
+      src="${imageUrl}"
+      alt="${name}"
+      style="
+        width:100%;
+        height:180px;
+        object-fit:cover;
+        border-radius:10px;
+        margin-bottom:10px;
+      "
+    >
+
+    <h3>${name}</h3>
+
+    <p>${category} • New listing</p>
+
+    <div class="price">
+      ₹${price}
+    </div>
+
+    <button onclick="contactSeller('${name}')">
+      Contact Seller
+    </button>
+
+  `;
+
+
+  document
+    .getElementById("listings")
+    .prepend(card);
+
+
+  // Clear form
+  document.getElementById("itemName").value = "";
+  document.getElementById("itemPrice").value = "";
+  document.getElementById("itemImage").value = "";
+
+
+  alert("Item posted successfully! 🎉");
+}
 
   let name =
     document.getElementById("itemName").value;
