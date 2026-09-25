@@ -229,6 +229,17 @@
 
 <script>
 
+const SUPABASE_URL =
+  "https://krkwifnckdjoezrfkkbk.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_skZEKVPxTihKbI2pvIoFGg_DlxRhjfR";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
 function contactSeller(item) {
   alert("Seller contact feature will be added soon for: " + item);
 }
